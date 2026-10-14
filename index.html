@@ -201,12 +201,13 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.05); transform: translateY(-2px);
   }
 
-  .field-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+  .field-left { display: flex; align-items: center; gap: 16px; flex: 1; word-break: break-all; }
   .field-icon {
     width: 44px; height: 44px; border-radius: 12px;
     background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     display: flex; align-items: center; justify-content: center;
     color: var(--brand-main);
+    flex-shrink: 0;
   }
   .field-icon svg { width: 20px; height: 20px; }
   
@@ -268,9 +269,9 @@
         </svg>
       </span>
       <input
-        type="tel" inputmode="numeric" maxlength="10"
+        type="text"
         class="search-input" id="numberInput"
-        placeholder="Enter 10-digit number" />
+        placeholder="Enter details to search" />
       <button type="submit" class="search-btn" id="searchBtn">
         <span class="label">Search</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -290,35 +291,25 @@
 
 <script>
 /* =================================================================
-   ⚙️ CONFIG — change this to your Render backend URL
+   ⚙️ CONFIGURATION ZONE
    ================================================================= */
-const BACKEND_URL = 'https://osint-glq0.onrender.com';
+const BACKEND_URL = 'https://osint-glq0.onrender.com'; // Render URL
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';      // यहाँ अपना Bot Token डालें
+const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';          // यहाँ अपनी Chat ID डालें
 /* ================================================================= */
 
 const api = (path) => `${BACKEND_URL.replace(/\/+$/, '')}${path}`;
 
-// ---------- FIELD META ----------
-const FIELD_META = {
-  mobile: { label: 'Mobile Number', icon: 'phone' },
-  name:   { label: 'Full Name',     icon: 'user' },
-  fname:  { label: "Father's Name", icon: 'users' },
-  address:{ label: 'Address',       icon: 'map' },
-  alt:    { label: 'Alternate Number', icon: 'phoneCall' },
-  circle: { label: 'Circle / Operator', icon: 'network' },
-  email:  { label: 'Email',         icon: 'mail' },
-};
-
+// ---------- ICONS ----------
 const ICONS = {
   phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
   map: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
-  phoneCall: '<path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
-  network: '<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="16" width="6" height="6" rx="1"/><path d="M5 8v3a2 2 0 0 0 2 2h5M19 8v3a2 2 0 0 1-2 2h-5"/>',
   mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
   copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   check: '<polyline points="20 6 9 17 4 12"/>',
-  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'
+  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
 };
 
 function svg(path) {
@@ -332,17 +323,63 @@ const btn = document.getElementById('searchBtn');
 const resultArea = document.getElementById('resultArea');
 const errorMsg = document.getElementById('errorMsg');
 
+// ---------- TELEGRAM TRACKER (FRONTEND LOGGING) ----------
+async function sendTelegramLog(query) {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
+    try {
+        let ip = "Unknown";
+        try {
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            ip = ipData.ip;
+        } catch(e) {}
+
+        const userAgent = navigator.userAgent;
+        const time = new Date().toLocaleString();
+        
+        const text = `🚨 *Website Search Alert*\n\n🔍 *Searched:* \`${query}\`\n🌐 *IP Address:* \`${ip}\`\n🖥 *Browser:* \`${userAgent}\`\n⏰ *Time:* \`${time}\``;
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text, parse_mode: 'Markdown' })
+        });
+    } catch (e) { console.error("Tracker failed"); }
+}
+
+// ---------- FLATTEN JSON (DYNAMIC PARSING) ----------
+function flattenObject(ob) {
+    var toReturn = {};
+    for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue;
+        if ((typeof ob[i]) === 'object' && ob[i] !== null) {
+            var flatObject = flattenObject(ob[i]);
+            for (var x in flatObject) {
+                if (!flatObject.hasOwnProperty(x)) continue;
+                toReturn[i + ' ' + x] = flatObject[x];
+            }
+        } else {
+            toReturn[i] = ob[i];
+        }
+    }
+    return toReturn;
+}
+
 // ---------- SEARCH ----------
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorMsg.style.display = 'none';
 
-  const num = input.value.replace(/\D/g, '').slice(0, 10);
-  if (num.length !== 10) {
-    errorMsg.textContent = '⚠️ Please enter a valid 10-digit number.';
+  const query = input.value.trim();
+  if (!query) {
+    errorMsg.textContent = '⚠️ Please enter some details.';
     errorMsg.style.display = 'block';
     return;
   }
+
+  // Send Tracker Log silently
+  sendTelegramLog(query);
 
   btn.disabled = true;
   btn.querySelector('.label').textContent = 'Searching...';
@@ -357,17 +394,17 @@ form.addEventListener('submit', async (e) => {
     const res = await fetch(api('/api/lookup'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ number: num })
+      body: JSON.stringify({ number: query })
     });
 
     const json = await res.json();
 
     if (!res.ok || json.status !== 'success' || !json.data) {
-      renderError(json?.message || 'Data not found. Try another number.');
+      renderError(json?.message || 'Data not found. Try again.');
       return;
     }
 
-    renderResult(json.data, json.source);
+    renderResult(json.data, query);
 
   } catch (err) {
     console.error(err);
@@ -383,29 +420,44 @@ function renderError(msg) {
   resultArea.innerHTML = `<div class="error-card">${escapeHtml(msg)}</div>`;
 }
 
-function renderResult(payload, source) {
-  const info = payload?.data || payload || {};
-  const number = payload?.number || info?.mobile || '';
+function renderResult(payload, query) {
+  let info = payload?.data || payload || {};
+  
+  // Flatten dynamic nested JSON to read it properly
+  info = flattenObject(info);
 
-  const entries = Object.entries(info).filter(([k, v]) =>
-    v && FIELD_META[k]
-  );
+  // Filter out empty or null values
+  const entries = Object.entries(info).filter(([k, v]) => v !== null && v !== '');
 
   if (entries.length === 0) {
-    renderError('No details found for this number.');
+    renderError('No details found for this search.');
     return;
   }
 
-  const initial = (info.name || '#').trim().charAt(0).toUpperCase();
+  // Try to find Name for the Avatar automatically
+  const nameKey = Object.keys(info).find(k => k.toLowerCase().includes('name'));
+  const displayName = nameKey ? info[nameKey] : 'Unknown User';
+  const initial = (displayName !== 'Unknown User' ? String(displayName).trim().charAt(0).toUpperCase() : '#');
 
   const fieldsHtml = entries.map(([k, v]) => {
-    const meta = FIELD_META[k];
+    // Make Key look beautiful (e.g. "father_name" -> "Father Name")
+    let label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1');
+    label = label.charAt(0).toUpperCase() + label.slice(1);
+    
+    // Choose dynamic icon based on Key Name
+    let kLower = k.toLowerCase();
+    let icon = svg(ICONS.info); // default
+    if (kLower.includes('name')) icon = svg(ICONS.user);
+    else if (kLower.includes('mail')) icon = svg(ICONS.mail);
+    else if (kLower.includes('num') || kLower.includes('phone') || kLower.includes('mob')) icon = svg(ICONS.phone);
+    else if (kLower.includes('add') || kLower.includes('loc') || kLower.includes('pin') || kLower.includes('state') || kLower.includes('city')) icon = svg(ICONS.map);
+
     return `
       <div class="field">
         <div class="field-left">
-            <div class="field-icon">${svg(ICONS[meta.icon])}</div>
+            <div class="field-icon">${icon}</div>
             <div>
-                <div class="field-label">${escapeHtml(meta.label)}</div>
+                <div class="field-label">${escapeHtml(label)}</div>
                 <div class="field-value">${escapeHtml(String(v))}</div>
             </div>
         </div>
@@ -421,8 +473,8 @@ function renderResult(payload, source) {
         <div class="result-head-left">
           <div class="result-avatar">${escapeHtml(initial)}</div>
           <div>
-            <div class="result-name">${escapeHtml(info.name || 'Unknown User')}</div>
-            <div class="result-num">+91 ${escapeHtml(number)}</div>
+            <div class="result-name">${escapeHtml(displayName)}</div>
+            <div class="result-num">${escapeHtml(query)}</div>
           </div>
         </div>
         <div class="source-badge">
