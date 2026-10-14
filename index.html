@@ -35,7 +35,6 @@
     flex-direction: column;
   }
 
-  /* ================ HEADER ================ */
   header {
     max-width: 1000px; margin: 0 auto;
     padding: 24px; width: 100%;
@@ -58,7 +57,6 @@
   .brand-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.03em; color: var(--text-main); }
   .brand-name span { color: var(--brand-main); }
 
-  /* ================ MAIN & HERO ================ */
   main { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 24px; width: 100%; }
 
   .hero { text-align: center; margin-bottom: 40px; }
@@ -77,7 +75,6 @@
     max-width: 500px; margin: 0 auto;
   }
 
-  /* ================ 3D SEARCH ================ */
   .search-wrap {
     max-width: 550px; margin: 0 auto 24px;
     position: relative;
@@ -135,7 +132,6 @@
     margin-top: 16px; animation: fadeUp 0.3s both;
   }
 
-  /* ================ RESULT ================ */
   .result-area { margin-top: 40px; }
 
   .loading-card, .error-card {
@@ -224,7 +220,6 @@
   .copy-btn.copied { color: #10b981; border-color: #10b981; }
   .copy-btn svg { width: 18px; height: 18px; }
 
-  /* ================ FOOTER ================ */
   footer {
     padding: 30px; text-align: center;
     font-size: 14px; font-weight: 500; color: var(--text-muted);
@@ -257,8 +252,8 @@
 
 <main>
   <section class="hero">
-    <h1>Smart Number Search</h1>
-    <p>Premium, clean, and blazing fast. Enter any 10-digit mobile number to get instant intelligence.</p>
+    <h1>Smart Search</h1>
+    <p>Premium, clean, and blazing fast. Enter Mobile Number, Email, or Aadhaar to get instant intelligence.</p>
   </section>
 
   <div class="search-wrap">
@@ -271,7 +266,7 @@
       <input
         type="text"
         class="search-input" id="numberInput"
-        placeholder="Enter details to search" />
+        placeholder="Mobile, Email, or Aadhaar..." />
       <button type="submit" class="search-btn" id="searchBtn">
         <span class="label">Search</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -293,14 +288,13 @@
 /* =================================================================
    ⚙️ CONFIGURATION ZONE
    ================================================================= */
-const BACKEND_URL = 'https://osint-glq0.onrender.com'; // Render URL
+const BACKEND_URL = 'https://osint-glq0.onrender.com'; 
 const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';      // यहाँ अपना Bot Token डालें
 const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';          // यहाँ अपनी Chat ID डालें
 /* ================================================================= */
 
 const api = (path) => `${BACKEND_URL.replace(/\/+$/, '')}${path}`;
 
-// ---------- ICONS ----------
 const ICONS = {
   phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
@@ -316,14 +310,12 @@ function svg(path) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 }
 
-// ---------- DOM ----------
 const form = document.getElementById('searchForm');
 const input = document.getElementById('numberInput');
 const btn = document.getElementById('searchBtn');
 const resultArea = document.getElementById('resultArea');
 const errorMsg = document.getElementById('errorMsg');
 
-// ---------- TELEGRAM TRACKER (FRONTEND LOGGING) ----------
 async function sendTelegramLog(query) {
     if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
     try {
@@ -348,7 +340,6 @@ async function sendTelegramLog(query) {
     } catch (e) { console.error("Tracker failed"); }
 }
 
-// ---------- FLATTEN JSON (DYNAMIC PARSING) ----------
 function flattenObject(ob) {
     var toReturn = {};
     for (var i in ob) {
@@ -366,19 +357,37 @@ function flattenObject(ob) {
     return toReturn;
 }
 
-// ---------- SEARCH ----------
+// --- LOCAL STRICT VALIDATION ---
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorMsg.style.display = 'none';
 
   const query = input.value.trim();
+  
+  // 1. Check if input is empty
   if (!query) {
     errorMsg.textContent = '⚠️ Please enter some details.';
     errorMsg.style.display = 'block';
     return;
   }
 
-  // Send Tracker Log silently
+  // 2. SMART VALIDATION (Stop fake/small requests here!)
+  const isOnlyNumbers = /^\d+$/.test(query);
+  
+  if (isOnlyNumbers) {
+      if (query.length !== 10 && query.length !== 12) {
+          errorMsg.textContent = '⚠️ Enter a valid 10-digit Mobile or 12-digit Aadhaar number.';
+          errorMsg.style.display = 'block';
+          return; // <--- API LIMIT SAVED (No fetch called)
+      }
+  } else {
+      if (!query.includes('@') || !query.includes('.')) {
+          errorMsg.textContent = '⚠️ Please enter a valid Email ID.';
+          errorMsg.style.display = 'block';
+          return; // <--- API LIMIT SAVED (No fetch called)
+      }
+  }
+
   sendTelegramLog(query);
 
   btn.disabled = true;
@@ -415,38 +424,37 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// ---------- RENDER ----------
 function renderError(msg) {
   resultArea.innerHTML = `<div class="error-card">${escapeHtml(msg)}</div>`;
 }
 
 function renderResult(payload, query) {
   let info = payload?.data || payload || {};
-  
-  // Flatten dynamic nested JSON to read it properly
   info = flattenObject(info);
 
-  // Filter out empty or null values
-  const entries = Object.entries(info).filter(([k, v]) => v !== null && v !== '');
+  const badKeys = ['credit', 'rate', 'limit', 'usage', 'message', 'status'];
+
+  const entries = Object.entries(info).filter(([k, v]) => {
+    const kLower = k.toLowerCase();
+    const isBad = badKeys.some(bad => kLower.includes(bad));
+    return v !== null && v !== '' && !isBad;
+  });
 
   if (entries.length === 0) {
     renderError('No details found for this search.');
     return;
   }
 
-  // Try to find Name for the Avatar automatically
   const nameKey = Object.keys(info).find(k => k.toLowerCase().includes('name'));
   const displayName = nameKey ? info[nameKey] : 'Unknown User';
   const initial = (displayName !== 'Unknown User' ? String(displayName).trim().charAt(0).toUpperCase() : '#');
 
   const fieldsHtml = entries.map(([k, v]) => {
-    // Make Key look beautiful (e.g. "father_name" -> "Father Name")
     let label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1');
     label = label.charAt(0).toUpperCase() + label.slice(1);
     
-    // Choose dynamic icon based on Key Name
     let kLower = k.toLowerCase();
-    let icon = svg(ICONS.info); // default
+    let icon = svg(ICONS.info); 
     if (kLower.includes('name')) icon = svg(ICONS.user);
     else if (kLower.includes('mail')) icon = svg(ICONS.mail);
     else if (kLower.includes('num') || kLower.includes('phone') || kLower.includes('mob')) icon = svg(ICONS.phone);
@@ -487,7 +495,6 @@ function renderResult(payload, query) {
   attachCopyHandlers();
 }
 
-// ---------- COPY ----------
 function attachCopyHandlers() {
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -505,7 +512,6 @@ function attachCopyHandlers() {
   });
 }
 
-// ---------- UTIL ----------
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
