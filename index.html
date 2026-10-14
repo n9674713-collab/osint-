@@ -3,342 +3,183 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NumberInfo — Premium Number Intelligence</title>
+<title>NumberInfo — Premium OSINT Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --brand-main: #2563eb;
-    --brand-hover: #1d4ed8;
-    --brand-light: #eff6ff;
-    --bg-color: #f4f7f9;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --card-bg: #ffffff;
-    --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-    --shadow-3d: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
-    --border-light: rgba(0, 0, 0, 0.05);
+    --brand-main: #2563eb; --brand-hover: #1d4ed8; --brand-light: #eff6ff;
+    --bg-color: #f4f7f9; --text-main: #0f172a; --text-muted: #64748b;
+    --card-bg: #ffffff; --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    --shadow-3d: 0 20px 40px -10px rgba(37, 99, 235, 0.15); --border-light: rgba(0, 0, 0, 0.05);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
-  
-  body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--bg-color);
-    color: var(--text-main);
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    display: flex;
-    flex-direction: column;
-  }
-
-  header {
-    max-width: 1000px; margin: 0 auto;
-    padding: 24px; width: 100%;
-    display: flex; align-items: center; justify-content: center;
-    animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
+  header { max-width: 1000px; margin: 0 auto; padding: 24px; width: 100%; display: flex; align-items: center; justify-content: center; animation: slideDown 0.6s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   .brand { display: flex; align-items: center; gap: 14px; }
-  .brand-logo {
-    width: 48px; height: 48px; border-radius: 16px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-  }
+  .brand-logo { width: 48px; height: 48px; border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
   .brand-logo svg { width: 24px; height: 24px; color: white; }
-  .brand-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.03em; color: var(--text-main); }
+  .brand-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; }
   .brand-name span { color: var(--brand-main); }
-
   main { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 24px; width: 100%; }
+  .hero { text-align: center; margin-bottom: 30px; }
+  .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; }
+  
+  .tabs-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; animation: fadeUp 0.6s 0.1s both; }
+  .tab-btn { padding: 10px 20px; border-radius: 99px; border: 1px solid var(--border-light); background: var(--card-bg); color: var(--text-muted); font-weight: 600; cursor: pointer; transition: all 0.3s; }
+  .tab-btn:hover { background: #f8fafc; color: var(--text-main); }
+  .tab-btn.active { background: var(--brand-main); color: white; border-color: var(--brand-main); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
 
-  .hero { text-align: center; margin-bottom: 40px; }
-  .hero h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    margin-bottom: 16px;
-    color: var(--text-main);
-  }
-  .hero p {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    max-width: 500px; margin: 0 auto;
-  }
-
-  .search-wrap {
-    max-width: 550px; margin: 0 auto 24px;
-    position: relative;
-    animation: fadeUp 0.6s 0.2s both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .search-form {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px;
-    border-radius: 24px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-soft);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .search-form:focus-within {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-3d);
-    border-color: rgba(37, 99, 235, 0.2);
-  }
-
-  .search-icon { padding-left: 16px; color: var(--text-muted); display: flex; align-items: center; }
-  .search-icon svg { width: 22px; height: 22px; }
-
-  .search-input {
-    flex: 1; min-width: 0;
-    background: transparent; border: 0; outline: 0;
-    padding: 16px 8px;
-    font-size: 18px; font-weight: 500;
-    font-family: inherit; color: var(--text-main);
-  }
-  .search-input::placeholder { color: #94a3b8; font-weight: 400; }
-
-  .search-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 16px 28px;
-    border-radius: 16px; border: 0;
-    background: var(--brand-main);
-    color: white; font-weight: 600; font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
-    transition: all 0.2s;
-  }
-  .search-btn:hover { background: var(--brand-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5); }
-  .search-btn:active { transform: translateY(0); }
+  .search-wrap { max-width: 550px; margin: 0 auto 24px; position: relative; animation: fadeUp 0.6s 0.2s both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .search-form { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 24px; background: var(--card-bg); border: 1px solid var(--border-light); box-shadow: var(--shadow-soft); transition: all 0.3s; }
+  .search-form:focus-within { transform: translateY(-3px); box-shadow: var(--shadow-3d); border-color: rgba(37, 99, 235, 0.2); }
+  .search-icon { padding-left: 16px; color: var(--text-muted); }
+  .search-input { flex: 1; border: 0; outline: 0; padding: 16px 8px; font-size: 18px; font-weight: 500; font-family: inherit; background: transparent; color: var(--text-main); }
+  .search-btn { display: flex; align-items: center; gap: 8px; padding: 16px 28px; border-radius: 16px; border: 0; background: var(--brand-main); color: white; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+  .search-btn:hover { background: var(--brand-hover); transform: translateY(-2px); }
   .search-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-  .search-btn svg { width: 18px; height: 18px; }
-
-  .error-msg {
-    text-align: center; font-size: 14px; font-weight: 500; color: #ef4444;
-    margin-top: 16px; animation: fadeUp 0.3s both;
-  }
+  .error-msg { text-align: center; font-size: 14px; font-weight: 500; color: #ef4444; margin-top: 16px; }
 
   .result-area { margin-top: 40px; }
-
-  .loading-card, .error-card {
-    max-width: 550px; margin: 0 auto;
-    padding: 40px 24px; border-radius: 24px;
-    background: var(--card-bg);
-    box-shadow: var(--shadow-soft);
-    text-align: center; border: 1px solid var(--border-light);
-  }
-  .spinner {
-    width: 40px; height: 40px; margin: 0 auto 16px;
-    border: 4px solid var(--brand-light);
-    border-top-color: var(--brand-main);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .loading-card, .error-card, .result-card { max-width: 550px; margin: 0 auto; padding: 32px; border-radius: 24px; background: var(--card-bg); box-shadow: var(--shadow-soft); border: 1px solid var(--border-light); animation: fadeUp 0.5s both; }
+  .loading-card, .error-card { text-align: center; }
+  .error-card { color: #ef4444; font-weight: 500; }
+  .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 4px solid var(--brand-light); border-top-color: var(--brand-main); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   
-  .error-card { padding: 24px; color: #ef4444; font-weight: 500; }
-
-  .result-card {
-    background: var(--card-bg);
-    border-radius: 24px;
-    padding: 32px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-light);
-    animation: fadeUp 0.5s both;
-  }
-
-  .result-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px; padding-bottom: 24px;
-    border-bottom: 1px solid #f1f5f9;
-  }
+  .result-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f1f5f9; }
   .result-head-left { display: flex; align-items: center; gap: 16px; }
-  .result-avatar {
-    width: 60px; height: 60px; border-radius: 18px;
-    background: var(--brand-light); color: var(--brand-main);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700; font-size: 24px;
-  }
-  .result-name { font-weight: 700; font-size: 22px; color: var(--text-main); }
-  .result-num { font-size: 15px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
-
-  .source-badge {
-    padding: 8px 14px; border-radius: 999px;
-    font-size: 12px; font-weight: 600;
-    background: #f1f5f9; color: var(--text-muted);
-    display: flex; align-items: center; gap: 6px;
-  }
-
+  .result-avatar { width: 60px; height: 60px; border-radius: 18px; background: var(--brand-light); color: var(--brand-main); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; }
+  .result-name { font-weight: 700; font-size: 22px; }
+  .result-num { font-size: 15px; color: var(--text-muted); margin-top: 4px; }
+  .source-badge { padding: 8px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; background: #f1f5f9; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
   .fields { display: grid; gap: 16px; }
-
-  .field {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; border-radius: 16px;
-    background: #f8fafc; border: 1px solid transparent;
-    transition: all 0.3s ease;
-  }
-  .field:hover {
-    background: white; border-color: rgba(37, 99, 235, 0.1);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05); transform: translateY(-2px);
-  }
-
+  .field { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-radius: 16px; background: #f8fafc; border: 1px solid transparent; transition: all 0.3s ease; }
+  .field:hover { background: white; border-color: rgba(37, 99, 235, 0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.05); transform: translateY(-2px); }
   .field-left { display: flex; align-items: center; gap: 16px; flex: 1; word-break: break-all; }
-  .field-icon {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--brand-main);
-    flex-shrink: 0;
-  }
+  .field-icon { width: 44px; height: 44px; border-radius: 12px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; color: var(--brand-main); flex-shrink: 0; }
   .field-icon svg { width: 20px; height: 20px; }
-  
-  .field-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-  .field-value { font-size: 16px; font-weight: 600; color: var(--text-main); margin-top: 2px; }
-
-  .copy-btn {
-    padding: 10px; border-radius: 12px;
-    background: white; border: 1px solid var(--border-light);
-    color: var(--text-muted); cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-  }
-  .copy-btn:hover { color: var(--brand-main); border-color: var(--brand-main); }
-  .copy-btn.copied { color: #10b981; border-color: #10b981; }
-  .copy-btn svg { width: 18px; height: 18px; }
-
-  footer {
-    padding: 30px; text-align: center;
-    font-size: 14px; font-weight: 500; color: var(--text-muted);
-  }
-  footer .heart { color: #ef4444; }
-  footer .handle { color: var(--text-main); font-weight: 700; }
-
-  @media (max-width: 600px) {
-    .search-form { flex-direction: column; border-radius: 20px; padding: 16px; }
-    .search-btn { width: 100%; justify-content: center; }
-    .result-head { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .field { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .copy-btn { width: 100%; display: flex; justify-content: center; }
-  }
+  .field-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+  .field-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+  footer { padding: 30px; text-align: center; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+  @media (max-width: 600px) { .search-form { flex-direction: column; padding: 16px; } .search-btn { width: 100%; justify-content: center; } .field { flex-direction: column; align-items: flex-start; gap: 12px; } }
 </style>
 </head>
 <body>
 
 <header>
   <div class="brand">
-    <div class="brand-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        <path d="m9 12 2 2 4-4"/>
-      </svg>
-    </div>
+    <div class="brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
     <div class="brand-name">Number<span>Info</span></div>
   </div>
 </header>
 
 <main>
-  <section class="hero">
-    <h1>Smart Search</h1>
-    <p>Premium, clean, and blazing fast. Enter Mobile Number, Email, or Aadhaar to get instant intelligence.</p>
-  </section>
+  <section class="hero"><h1>Smart Intelligence</h1></section>
+  <div class="tabs-container">
+    <button class="tab-btn active" data-tool="number">📞 Number</button>
+    <button class="tab-btn" data-tool="email">📧 Email</button>
+    <button class="tab-btn" data-tool="aadhaar">🪪 Aadhaar</button>
+  </div>
 
   <div class="search-wrap">
     <form class="search-form" id="searchForm" autocomplete="off">
-      <span class="search-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-      </span>
-      <input
-        type="text"
-        class="search-input" id="numberInput"
-        placeholder="Mobile, Email, or Aadhaar..." />
-      <button type="submit" class="search-btn" id="searchBtn">
-        <span class="label">Search</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </button>
+      <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <input type="text" maxlength="20" class="search-input" id="mainInput" placeholder="Enter Mobile Number (e.g. +91 98765 43210)" />
+      <button type="submit" class="search-btn" id="searchBtn"><span class="label">Search</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
     </form>
     <div class="error-msg" id="errorMsg" style="display:none"></div>
   </div>
 
   <div class="result-area" id="resultArea"></div>
 </main>
-
-<footer>
-  Built with <span class="heart">♥</span> by <span class="handle">@Aman Kumar</span>
-</footer>
+<footer>Built with ♥ by @Aman Kumar</footer>
 
 <script>
-/* =================================================================
-   ⚙️ CONFIGURATION ZONE
-   ================================================================= */
-const BACKEND_URL = 'https://osint-glq0.onrender.com'; 
-const TELEGRAM_BOT_TOKEN = '8918285383:AAGMtMFJrv75-jnUTdL-Hb9oc7qrpR2kiOw';      // यहाँ अपना Bot Token डालें
-const TELEGRAM_CHAT_ID = '8691519315';          // यहाँ अपनी Chat ID डालें
-/* ================================================================= */
-
+const BACKEND_URL = 'https://osint-glq0.onrender.com'; // अपना Render URL रखें
 const api = (path) => `${BACKEND_URL.replace(/\/+$/, '')}${path}`;
 
-const ICONS = {
-  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
-  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  map: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
-  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
-  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
-  check: '<polyline points="20 6 9 17 4 12"/>',
-  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
-};
+let webUserId = localStorage.getItem('osint_web_uuid');
+if (!webUserId) { webUserId = 'web-' + Math.random().toString(36).substr(2, 9); localStorage.setItem('osint_web_uuid', webUserId); }
 
-function svg(path) {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
-}
-
+let currentTool = 'number';
+const inputField = document.getElementById('mainInput');
+const errorMsg = document.getElementById('errorMsg');
 const form = document.getElementById('searchForm');
-const input = document.getElementById('numberInput');
 const btn = document.getElementById('searchBtn');
 const resultArea = document.getElementById('resultArea');
-const errorMsg = document.getElementById('errorMsg');
 
-async function sendTelegramLog(query) {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
-    try {
-        let ip = "Unknown";
-        try {
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            ip = ipData.ip;
-        } catch(e) {}
+document.querySelectorAll('.tab-btn').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTool = e.target.dataset.tool;
+        inputField.value = ''; errorMsg.style.display = 'none';
 
-        const userAgent = navigator.userAgent;
-        const time = new Date().toLocaleString();
-        
-        const text = `🚨 *Website Search Alert*\n\n🔍 *Searched:* \`${query}\`\n🌐 *IP Address:* \`${ip}\`\n🖥 *Browser:* \`${userAgent}\`\n⏰ *Time:* \`${time}\``;
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text, parse_mode: 'Markdown' })
-        });
-    } catch (e) { console.error("Tracker failed"); }
-}
+        if(currentTool === 'number') {
+            inputField.setAttribute('maxlength', '20'); // Space aur +91 ke liye jagah
+            inputField.placeholder = "Enter Mobile Number (e.g. +91 98765 43210)";
+        } else if(currentTool === 'aadhaar') {
+            inputField.setAttribute('maxlength', '20'); // Space ke liye jagah
+            inputField.placeholder = "Enter 12-digit Aadhaar Number";
+        } else {
+            inputField.setAttribute('maxlength', '50');
+            inputField.placeholder = "Enter Email ID";
+        }
+    });
+});
+
+// Allow typing numbers, spaces, and + for smart parsing
+inputField.addEventListener('input', function() {
+    if(currentTool === 'number' || currentTool === 'aadhaar') {
+        this.value = this.value.replace(/[^0-9+\- ]/g, ''); 
+    }
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorMsg.style.display = 'none';
+  let query = inputField.value.trim();
+  
+  if (!query) return showError('⚠️ Please enter details.');
+
+  // SMART CLEANER LOGIC
+  if (currentTool === 'number') {
+      query = query.replace(/[\s-]/g, ''); // Space & dash hatao
+      if (query.startsWith('+91')) query = query.substring(3);
+      else if (query.startsWith('91') && query.length === 12) query = query.substring(2);
+      
+      if (query.length !== 10) return showError('⚠️ Must be exactly 10 digits after removing +91.');
+  } 
+  else if (currentTool === 'aadhaar') {
+      query = query.replace(/[\s-]/g, ''); // Space & dash hatao
+      if (query.length !== 12) return showError('⚠️ Must be exactly 12 digits.');
+  } 
+  else if (currentTool === 'email' && (!query.includes('@') || !query.includes('.'))) {
+      return showError('⚠️ Enter a valid Email ID.');
+  }
+
+  btn.disabled = true; btn.querySelector('.label').textContent = 'Searching...';
+  resultArea.innerHTML = `<div class="loading-card"><div class="spinner"></div><div style="color: var(--text-muted); font-weight: 500;">Fetching secure data...</div></div>`;
+
+  try {
+    const res = await fetch(api('/api/lookup'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query, tool: currentTool, userId: webUserId })
+    });
+    const json = await res.json();
+    if (!res.ok || json.status !== 'success' || !json.data) return renderError(json?.message || 'Data not found. Try again.');
+    renderResult(json.data, query);
+  } catch (err) { renderError('Network issue. Please check API URL or try again.');
+  } finally { btn.disabled = false; btn.querySelector('.label').textContent = 'Search'; }
+});
+
+function showError(msg) { errorMsg.textContent = msg; errorMsg.style.display = 'block'; }
+function renderError(msg) { resultArea.innerHTML = `<div class="error-card">${escapeHtml(msg)}</div>`; }
 
 function flattenObject(ob) {
     var toReturn = {};
@@ -346,178 +187,36 @@ function flattenObject(ob) {
         if (!ob.hasOwnProperty(i)) continue;
         if ((typeof ob[i]) === 'object' && ob[i] !== null) {
             var flatObject = flattenObject(ob[i]);
-            for (var x in flatObject) {
-                if (!flatObject.hasOwnProperty(x)) continue;
-                toReturn[i + ' ' + x] = flatObject[x];
-            }
-        } else {
-            toReturn[i] = ob[i];
-        }
+            for (var x in flatObject) { if (flatObject.hasOwnProperty(x)) toReturn[i + ' ' + x] = flatObject[x]; }
+        } else { toReturn[i] = ob[i]; }
     }
     return toReturn;
 }
 
-// --- LOCAL STRICT VALIDATION ---
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  errorMsg.style.display = 'none';
-
-  const query = input.value.trim();
-  
-  // 1. Check if input is empty
-  if (!query) {
-    errorMsg.textContent = '⚠️ Please enter some details.';
-    errorMsg.style.display = 'block';
-    return;
-  }
-
-  // 2. SMART VALIDATION (Stop fake/small requests here!)
-  const isOnlyNumbers = /^\d+$/.test(query);
-  
-  if (isOnlyNumbers) {
-      if (query.length !== 10 && query.length !== 12) {
-          errorMsg.textContent = '⚠️ Enter a valid 10-digit Mobile or 12-digit Aadhaar number.';
-          errorMsg.style.display = 'block';
-          return; // <--- API LIMIT SAVED (No fetch called)
-      }
-  } else {
-      if (!query.includes('@') || !query.includes('.')) {
-          errorMsg.textContent = '⚠️ Please enter a valid Email ID.';
-          errorMsg.style.display = 'block';
-          return; // <--- API LIMIT SAVED (No fetch called)
-      }
-  }
-
-  sendTelegramLog(query);
-
-  btn.disabled = true;
-  btn.querySelector('.label').textContent = 'Searching...';
-
-  resultArea.innerHTML = `
-    <div class="loading-card">
-      <div class="spinner"></div>
-      <div style="color: var(--text-muted); font-weight: 500;">Fetching secure data...</div>
-    </div>`;
-
-  try {
-    const res = await fetch(api('/api/lookup'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ number: query })
-    });
-
-    const json = await res.json();
-
-    if (!res.ok || json.status !== 'success' || !json.data) {
-      renderError(json?.message || 'Data not found. Try again.');
-      return;
-    }
-
-    renderResult(json.data, query);
-
-  } catch (err) {
-    console.error(err);
-    renderError('Network issue. Please check API URL or try again.');
-  } finally {
-    btn.disabled = false;
-    btn.querySelector('.label').textContent = 'Search';
-  }
-});
-
-function renderError(msg) {
-  resultArea.innerHTML = `<div class="error-card">${escapeHtml(msg)}</div>`;
-}
-
 function renderResult(payload, query) {
-  let info = payload?.data || payload || {};
-  info = flattenObject(info);
-
+  let info = flattenObject(payload?.data || payload || {});
   const badKeys = ['credit', 'rate', 'limit', 'usage', 'message', 'status'];
-
-  const entries = Object.entries(info).filter(([k, v]) => {
-    const kLower = k.toLowerCase();
-    const isBad = badKeys.some(bad => kLower.includes(bad));
-    return v !== null && v !== '' && !isBad;
-  });
-
-  if (entries.length === 0) {
-    renderError('No details found for this search.');
-    return;
-  }
+  const entries = Object.entries(info).filter(([k, v]) => v !== null && v !== '' && !badKeys.some(bad => k.toLowerCase().includes(bad)));
+  if (entries.length === 0) return renderError('No details found for this search.');
 
   const nameKey = Object.keys(info).find(k => k.toLowerCase().includes('name'));
   const displayName = nameKey ? info[nameKey] : 'Unknown User';
   const initial = (displayName !== 'Unknown User' ? String(displayName).trim().charAt(0).toUpperCase() : '#');
 
   const fieldsHtml = entries.map(([k, v]) => {
-    let label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1');
-    label = label.charAt(0).toUpperCase() + label.slice(1);
-    
-    let kLower = k.toLowerCase();
-    let icon = svg(ICONS.info); 
-    if (kLower.includes('name')) icon = svg(ICONS.user);
-    else if (kLower.includes('mail')) icon = svg(ICONS.mail);
-    else if (kLower.includes('num') || kLower.includes('phone') || kLower.includes('mob')) icon = svg(ICONS.phone);
-    else if (kLower.includes('add') || kLower.includes('loc') || kLower.includes('pin') || kLower.includes('state') || kLower.includes('city')) icon = svg(ICONS.map);
-
-    return `
-      <div class="field">
-        <div class="field-left">
-            <div class="field-icon">${icon}</div>
-            <div>
-                <div class="field-label">${escapeHtml(label)}</div>
-                <div class="field-value">${escapeHtml(String(v))}</div>
-            </div>
-        </div>
-        <button class="copy-btn" data-copy="${escapeAttr(String(v))}" title="Copy">
-          ${svg(ICONS.copy)}
-        </button>
-      </div>`;
+    let label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1'); label = label.charAt(0).toUpperCase() + label.slice(1);
+    let icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`; 
+    let kL = k.toLowerCase();
+    if (kL.includes('name')) icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    else if (kL.includes('mail')) icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>`;
+    else if (kL.includes('num') || kL.includes('phone') || kL.includes('mob')) icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+    else if (kL.includes('add') || kL.includes('loc') || kL.includes('pin') || kL.includes('state') || kL.includes('city')) icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    return `<div class="field"><div class="field-left"><div class="field-icon">${icon}</div><div><div class="field-label">${escapeHtml(label)}</div><div class="field-value">${escapeHtml(String(v))}</div></div></div></div>`;
   }).join('');
 
-  resultArea.innerHTML = `
-    <div class="result-card">
-      <div class="result-head">
-        <div class="result-head-left">
-          <div class="result-avatar">${escapeHtml(initial)}</div>
-          <div>
-            <div class="result-name">${escapeHtml(displayName)}</div>
-            <div class="result-num">${escapeHtml(query)}</div>
-          </div>
-        </div>
-        <div class="source-badge">
-            ${svg(ICONS.zap)} Verified Data
-        </div>
-      </div>
-      <div class="fields">${fieldsHtml}</div>
-    </div>`;
-
-  attachCopyHandlers();
+  resultArea.innerHTML = `<div class="result-card"><div class="result-head"><div class="result-head-left"><div class="result-avatar">${escapeHtml(initial)}</div><div><div class="result-name">${escapeHtml(displayName)}</div><div class="result-num">${escapeHtml(query)}</div></div></div><div class="source-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Verified</div></div><div class="fields">${fieldsHtml}</div></div>`;
 }
-
-function attachCopyHandlers() {
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const text = btn.getAttribute('data-copy');
-      try {
-        await navigator.clipboard.writeText(text);
-        btn.classList.add('copied');
-        btn.innerHTML = svg(ICONS.check);
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          btn.innerHTML = svg(ICONS.copy);
-        }, 2000);
-      } catch {}
-    });
-  });
-}
-
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-}
-function escapeAttr(str) {
-  return escapeHtml(str).replace(/`/g, '&#96;');
-}
+function escapeHtml(str) { return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 </script>
 </body>
 </html>
